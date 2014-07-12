@@ -246,11 +246,12 @@ __sq.cad = {};
  */
 
 wss.on('connection', function(ws) //for every DLL websocket
-  {　
+  {　ws.pair ='eur';
+  ws.period ='m1';
     var wsTL = function(tl)
     {
-      // ticker.setLine(2, 'wsTLset');
-      //screen.render();
+        ticker.setLine(2, '!!!!!!!!!!wsTLset');
+       screen.render();
       ws.on('message', function(msg)
       {
 
