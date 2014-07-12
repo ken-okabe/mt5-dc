@@ -1,0 +1,25 @@
+{
+  "name": "mt5-dc",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "blessed": "*",
+    "spacetime": "*",
+    "ws": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kenokabe/mt5-dc"
+  },
+  "author": "Ken Okabe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kenokabe/mt5-dc/issues"
+  },
+  "homepage": "https://github.com/kenokabe/mt5-dc"
+}
