@@ -9,9 +9,10 @@ var log = function(msg)
   console.log('core:', msg);
 };
 
+var moment = require('moment');
 
 var blessed = require('blessed');
-
+/*
 // Create a screen object.
 var screen = blessed.screen();
 
@@ -169,7 +170,7 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key)
 
 // Render the screen.
 screen.render();
-
+*/
 //-------------
 var _ = require('spacetime').lazy();
 var __ = require('spacetime').timeline();
@@ -199,39 +200,24 @@ var wss = new WebSocketServer(
 
 
 var _sq = {};
-_sq.eur = {};
-_sq.jpy = {};
-_sq.gbp = {};
-_sq.chf = {};
-_sq.aud = {};
-_sq.nzd = {};
-_sq.cad = {};
+_sq.EURUSD = {};
+_sq.USDJPY = {};
+_sq.GBPUSD = {};
+_sq.USDCHF = {};
+_sq.AUDUSD = {};
+_sq.NZDUSD = {};
+_sq.CADUSD = {};
 
 
-Object.keys(_sq).map(function(val)
-{
-  _sq[val]['m1'] = _(
-  {});
-  _sq[val]['m5'] = _(
-  {});
-  _sq[val]['m30'] = _(
-  {});
-  _sq[val]['m120'] = _(
-  {});
-  _sq[val]['mD'] = _(
-  {});
-  _sq[val]['mW'] = _(
-  {});
-});
 
 var __sq = {};
-__sq.eur = {};
-__sq.jpy = {};
-__sq.gbp = {};
-__sq.chf = {};
-__sq.aud = {};
-__sq.nzd = {};
-__sq.cad = {};
+__sq.EURUSD = {};
+__sq.USDJPY = {};
+__sq.GBPUSD = {};
+__sq.USDCHF = {};
+__sq.AUDUSD = {};
+__sq.NZDUSD = {};
+__sq.CADUSD = {};
 
 　　
 /*
@@ -246,40 +232,84 @@ __sq.cad = {};
  */
 
 wss.on('connection', function(ws) //for every DLL websocket
-  {　ws.pair ='eur';
-  ws.period ='m1';
+  {
+    log('!!!!!!!!!!connected');
+    var pair;
+    var period;
+
+
     var wsTL = function(tl)
     {
-        ticker.setLine(2, '!!!!!!!!!!wsTLset');
-       screen.render();
       ws.on('message', function(msg)
       {
+        //  log(msg);
+        var obj = JSON.parse(msg);
 
-        tl.val = msg;
-        _sq[ws.pair][ws.period].appear(ws.timestamp, ws.data).compute();
+        if (!pair)
+        {
+          pair = obj.pair;
+          period = obj.period;
+          log(pair);
+          log(period);
+        }
+
+        tl.val = obj;
 
         tl.next();
 
-        ticker.setLine(5, msg);
-        screen.render();
+
       });
+
+      tl.stop = function()
+      {
+        //  ws.removeListener('message', function() {});
+      };
+    };
+
+
+    var pairTL = function(tl)
+    {
+
+      __(wsTL)
+        .compute(function(x)
+        {
+          tl.val = x;
+
+          if (period !== 'mTick')
+            _sq[pair][period].appear(moment().format(), x).compute();
+
+          tl.next();
+
+
+        });
+
 
       tl.stop = function() {
 
       };
     };
 
-    __sq[ws.pair][ws.period] = __(wsTL);
 
-    __sq[ws.pair][ws.period]
+
+    __(wsTL).take(1)
       .compute(function(x)
       {
-        log(x);
+        log('__wsTL0');
+        log(pair);
+        log(period);
+        _sq[pair][period] = _([]);
 
-        if (x.type === 'ticker')
-          ticker.setLine(1, x);
-        screen.render();
+        __sq[pair][period] = __(pairTL);
+
+        __sq[pair][period]
+          .compute(function(x)
+          {
+            log(x);
+          });
+
       });
+
+
 
   });
 
@@ -296,8 +326,6 @@ var timerTL = function(tl)
 {
   var _natural = _(natural);
   var it = _natural.it();
-  ticker.setLine(9, 'timerTLset');
-  screen.render();
   var interval = setInterval(function()
   {
     tl.val = it.next();
@@ -312,10 +340,9 @@ var timerTL = function(tl)
 
 
 var __timerTL = __(timerTL);
-
+/*
 __timerTL
   .compute(function(x)
   {
-    ticker.setLine(10, x);
-    screen.render();
-  });
+    log(x);
+  });*/
