@@ -206,7 +206,7 @@ _sq.GBPUSD = {};
 _sq.USDCHF = {};
 _sq.AUDUSD = {};
 _sq.NZDUSD = {};
-_sq.CADUSD = {};
+_sq.USDCAD = {};
 
 
 
@@ -217,7 +217,7 @@ __sq.GBPUSD = {};
 __sq.USDCHF = {};
 __sq.AUDUSD = {};
 __sq.NZDUSD = {};
-__sq.CADUSD = {};
+__sq.USDCAD = {};
 
 　　
 /*
