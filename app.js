@@ -9,6 +9,7 @@ var log = function(msg)
   console.log('core:', msg);
 };
 
+log('started');
 var moment = require('moment');
 
 var blessed = require('blessed');
@@ -209,7 +210,6 @@ _sq.NZDUSD = {};
 _sq.USDCAD = {};
 
 
-
 var __sq = {};
 __sq.EURUSD = {};
 __sq.USDJPY = {};
@@ -219,21 +219,11 @@ __sq.AUDUSD = {};
 __sq.NZDUSD = {};
 __sq.USDCAD = {};
 
-　　
-/*
- _sq.eur.m1
-   .appear('test')
-   .appear('test2')
-   .compute(function(x)
-   {
-     log('==result');
-     log(x);
-   });
- */
+
 
 wss.on('connection', function(ws) //for every DLL websocket
   {
-    log('!!!!!!!!!!connected');
+    log('!!--------connected');
     var pair;
     var period;
 
@@ -276,7 +266,18 @@ wss.on('connection', function(ws) //for every DLL websocket
           tl.val = x;
 
           if (period !== 'mTick')
-            _sq[pair][period].appear(moment().format(), x).compute();
+          {
+            /*  log('@@@@@@@@@@@');
+            log(pair);
+            log(period);
+            log(x);*/
+            _sq[pair][period].appear(x.time, x);
+
+            /*  _sq[pair][period].compute(function(x)
+            {
+              log(x);
+            });*/
+          }
 
           tl.next();
 
@@ -297,14 +298,15 @@ wss.on('connection', function(ws) //for every DLL websocket
         log('__wsTL0');
         log(pair);
         log(period);
-        _sq[pair][period] = _([]);
+        _sq[pair][period] = _(
+        {});
 
         __sq[pair][period] = __(pairTL);
 
         __sq[pair][period]
           .compute(function(x)
           {
-            log(x);
+            //  log(x);
           });
 
       });
