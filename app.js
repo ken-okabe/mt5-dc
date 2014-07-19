@@ -306,7 +306,7 @@ wss.on('connection', function(ws) //for every DLL websocket
         __sq[pair][period]
           .compute(function(x)
           {
-            //  log(x);
+             log(x);
           });
 
       });
