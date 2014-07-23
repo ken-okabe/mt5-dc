@@ -173,8 +173,10 @@ screen.key(['escape', 'q', 'C-c'], function(ch, key)
 screen.render();
 */
 //-------------
-var _ = require('spacetime').lazy();
-var __ = require('spacetime').timeline();
+var _ = require('spacetime')
+  .lazy();
+var __ = require('spacetime')
+  .timeline();
 
 var _x = _(
 {});
@@ -193,10 +195,16 @@ _x.compute(function(x)
  */
 
 
-var WebSocketServer = require('ws').Server;
+var WebSocketServer = require('ws')
+  .Server;
 var wss = new WebSocketServer(
 {
   port: 9998
+});
+
+var wss1 = new WebSocketServer(
+{
+  port: 9999
 });
 
 
@@ -226,7 +234,6 @@ wss.on('connection', function(ws) //for every DLL websocket
     log('!!--------connected');
     var pair;
     var period;
-
 
     var wsTL = function(tl)
     {
@@ -292,7 +299,8 @@ wss.on('connection', function(ws) //for every DLL websocket
 
 
 
-    __(wsTL).take(1)
+    __(wsTL)
+      .take(1)
       .compute(function(x)
       {
         log('__wsTL0');
@@ -306,7 +314,7 @@ wss.on('connection', function(ws) //for every DLL websocket
         __sq[pair][period]
           .compute(function(x)
           {
-             log(x);
+            log(x);
           });
 
       });
@@ -316,7 +324,49 @@ wss.on('connection', function(ws) //for every DLL websocket
   });
 
 
+var periods = ['mTick', 'mW', 'mD', 'm120', 'm30', 'm5', 'm1'];
 
+
+wss1.on('connection', function(ws) //for every DLL websocket
+  {
+    log('!!wss1--------connected');
+
+    Object.keys(_sq)
+      .map(function(x)
+      {
+        log(x);
+        Object.keys(_sq[x])
+          .map(function(y)
+          {
+            log(y);
+            if (!_sq[x][y])
+            {
+              log(x + ' ' + y + ' empty');
+            }
+            else
+            {
+              log(x + ' ' + y + ' has data');
+              //ws.send(_sq[x][y]);
+
+              _sq[x][y].compute(function(z)
+              {
+                log(z);
+                var obj = {};
+                obj.type = 'historical';
+                obj.pair = x;
+                obj.period = y;
+                obj.data = z;
+                ws.send(JSON.stringify(obj));
+              });
+            }
+          });
+
+      });
+
+
+
+
+  });
 
 
 
