@@ -209,24 +209,7 @@ var wss1 = new WebSocketServer(
 
 
 var _sq = {};
-_sq.EURUSD = {};
-_sq.USDJPY = {};
-_sq.GBPUSD = {};
-_sq.USDCHF = {};
-_sq.AUDUSD = {};
-_sq.NZDUSD = {};
-_sq.USDCAD = {};
-
-
 var __sq = {};
-__sq.EURUSD = {};
-__sq.USDJPY = {};
-__sq.GBPUSD = {};
-__sq.USDCHF = {};
-__sq.AUDUSD = {};
-__sq.NZDUSD = {};
-__sq.USDCAD = {};
-
 
 
 wss.on('connection', function(ws) //for every DLL websocket
@@ -274,16 +257,8 @@ wss.on('connection', function(ws) //for every DLL websocket
 
           if (period !== 'mTick')
           {
-            /*  log('@@@@@@@@@@@');
-            log(pair);
-            log(period);
-            log(x);*/
             _sq[pair][period].appear(x.time, x);
 
-            /*  _sq[pair][period].compute(function(x)
-            {
-              log(x);
-            });*/
           }
 
           tl.next();
@@ -306,15 +281,24 @@ wss.on('connection', function(ws) //for every DLL websocket
         log('__wsTL0');
         log(pair);
         log(period);
+
+        if (!_sq[pair])
+        {
+          _sq[pair] = {};
+          __sq[pair] = {};
+        }
+
         _sq[pair][period] = _(
         {});
 
         __sq[pair][period] = __(pairTL);
 
         __sq[pair][period]
-          .compute(function(x)
+          .compute(function(z)
           {
-            log(x);
+            log(z);
+
+
           });
 
       });
@@ -324,7 +308,6 @@ wss.on('connection', function(ws) //for every DLL websocket
   });
 
 
-var periods = ['mTick', 'mW', 'mD', 'm120', 'm30', 'm5', 'm1'];
 
 
 wss1.on('connection', function(ws) //for every DLL websocket
@@ -338,29 +321,38 @@ wss1.on('connection', function(ws) //for every DLL websocket
         Object.keys(_sq[x])
           .map(function(y)
           {
-            log(y);
-            if (!_sq[x][y])
+            _sq[x][y].compute(function(z)
             {
-              log(x + ' ' + y + ' empty');
-            }
-            else
-            {
-              log(x + ' ' + y + ' has data');
-              //ws.send(_sq[x][y]);
+              log(z);
+              var obj = {};
+              obj.type = 'historical';
+              obj.pair = x;
+              obj.period = y;
+              obj.data = z;
+              ws.send(JSON.stringify(obj));
+            });
 
-              _sq[x][y].compute(function(z)
+
+          });
+
+
+        Object.keys(__sq[x])
+          .map(function(y)
+          {
+            __sq[x][y]
+              .compute(function(z)
               {
                 log(z);
                 var obj = {};
-                obj.type = 'historical';
+                obj.type = 'onbar';
                 obj.pair = x;
                 obj.period = y;
                 obj.data = z;
                 ws.send(JSON.stringify(obj));
-              });
-            }
-          });
 
+
+              });
+          });
       });
 
 
