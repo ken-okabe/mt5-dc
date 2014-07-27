@@ -240,7 +240,6 @@ wss.on('connection', function(ws) //for every DLL websocket
         {});
         __sq[pair][period] = __();
 
-
         __sq[pair][period]
           .compute(function(x)
           {
@@ -252,19 +251,15 @@ wss.on('connection', function(ws) //for every DLL websocket
             log(x);
 
           });
-
       }
       else
       {
       //  log(obj);
         __sq[pair][period]
         .appear(obj);
-
       }
 
     });
-
-
 
   });
 
@@ -315,9 +310,6 @@ wss1.on('connection', function(ws) //for every DLL websocket
               });
           });
       });
-
-
-
 
   });
 
