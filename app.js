@@ -218,90 +218,51 @@ wss.on('connection', function(ws) //for every DLL websocket
     var pair;
     var period;
 
-    var wsTL = function(tl)
+    ws.on('message', function(msg)
     {
-      ws.on('message', function(msg)
+      //  log(msg);
+      var obj = JSON.parse(msg);
+
+      if (!pair) //new connection
       {
-        //  log(msg);
-        var obj = JSON.parse(msg);
-
-        if (!pair)
-        {
-          pair = obj.pair;
-          period = obj.period;
-          log(pair);
-          log(period);
-        }
-
-        tl.val = obj;
-
-        tl.next();
-
-
-      });
-
-      tl.stop = function()
-      {
-        //  ws.removeListener('message', function() {});
-      };
-    };
-
-
-    var pairTL = function(tl)
-    {
-
-      __(wsTL)
-        .compute(function(x)
-        {
-          tl.val = x;
-
-          if (period !== 'mTick')
-          {
-            _sq[pair][period].appear(x.time, x);
-
-          }
-
-          tl.next();
-
-
-        });
-
-
-      tl.stop = function() {
-
-      };
-    };
-
-
-
-    __(wsTL)
-      .take(1)
-      .compute(function(x)
-      {
-        log('__wsTL0');
+        pair = obj.pair;
+        period = obj.period;
         log(pair);
         log(period);
 
-        if (!_sq[pair])
-        {
-          _sq[pair] = {};
-          __sq[pair] = {};
-        }
+        _sq[pair] = {};
+        __sq[pair] = {};
+      }
 
+      if (!__sq[pair][period])
+      {
         _sq[pair][period] = _(
         {});
+        __sq[pair][period] = __();
 
-        __sq[pair][period] = __(pairTL);
 
         __sq[pair][period]
-          .compute(function(z)
+          .compute(function(x)
           {
-            log(z);
+            if (period !== 'mTick')
+              {
+                _sq[pair][period].appear(x.time, x);
+              }
 
+            log(x);
 
           });
 
-      });
+      }
+      else
+      {
+      //  log(obj);
+        __sq[pair][period]
+        .appear(obj);
+
+      }
+
+    });
 
 
 
