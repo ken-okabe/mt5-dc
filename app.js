@@ -215,6 +215,7 @@ var __sq = {};
 wss.on('connection', function(ws) //for every DLL websocket
   {
     log('!!--------connected');
+
     var pair;
     var period;
 
@@ -223,19 +224,20 @@ wss.on('connection', function(ws) //for every DLL websocket
       //  log(msg);
       var obj = JSON.parse(msg);
 
-      if (!pair) //new connection
+      if (!period)
       {
         pair = obj.pair;
         period = obj.period;
+        _sq[pair] = {};
+        __sq[pair] = {};
+
+      }
+
+      if (!__sq[pair][period]) //new connection
+      {
         log(pair);
         log(period);
 
-        _sq[pair] = {};
-        __sq[pair] = {};
-      }
-
-      if (!__sq[pair][period])
-      {
         _sq[pair][period] = _(
         {});
         __sq[pair][period] = __();
@@ -247,29 +249,23 @@ wss.on('connection', function(ws) //for every DLL websocket
               {
                 _sq[pair][period].appear(x.time, x);
               }
-
-            log(x);
-
           });
       }
       else
       {
-      //  log(obj);
-        __sq[pair][period]
-        .appear(obj);
+           __sq[pair][period]
+            .appear(obj);
       }
 
     });
 
   });
-
-
-
+ 
 
 wss1.on('connection', function(ws) //for every DLL websocket
   {
     log('!!wss1--------connected');
-
+log(_sq);
     Object.keys(_sq)
       .map(function(x)
       {
@@ -277,9 +273,10 @@ wss1.on('connection', function(ws) //for every DLL websocket
         Object.keys(_sq[x])
           .map(function(y)
           {
+            log(y);
             _sq[x][y].compute(function(z)
             {
-              log(z);
+            //  log(z);
               var obj = {};
               obj.type = 'historical';
               obj.pair = x;
@@ -298,7 +295,7 @@ wss1.on('connection', function(ws) //for every DLL websocket
             __sq[x][y]
               .compute(function(z)
               {
-                log(z);
+              //  log(z);
                 var obj = {};
                 obj.type = 'onbar';
                 obj.pair = x;
