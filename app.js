@@ -236,15 +236,40 @@ wss.on('connection', function(ws) //for every DLL websocket
           .compute(function(x)
           {
             if (obj.period !== 'mTick')
-              {
-                _sq[obj.pair][obj.period].appear(x.time, x);
-              }
+            {
+              log(obj.pair);
+              log(obj.period);
+
+              log(x);
+              _sq[obj.pair][obj.period].appear(x.time, x);
+            }
+
+
           });
       }
       else
       {
-           __sq[obj.pair][obj.period]
-            .appear(obj);
+        var dt = obj.time;
+
+        var date = dt.split(' ')[0];
+        var time = dt.split(' ')[1];
+
+        var YY = date.split('.')[0];
+        var MM = date.split('.')[1];
+        var DD = date.split('.')[2];
+
+        var hh = time.split(':')[0];
+        var mm = time.split(':')[1];
+
+        //1412310100
+        var cD = YY * 100000000 + MM * 1000000 + DD * 10000;
+        var cT = hh * 100 + mm * 1;
+
+        var c = cD + cT;
+        obj.time = c;
+
+        __sq[obj.pair][obj.period]
+          .appear(obj);
       }
 
     });
@@ -255,7 +280,7 @@ wss.on('connection', function(ws) //for every DLL websocket
 wss1.on('connection', function(ws) //for every DLL websocket
   {
     log('!!wss1--------connected');
-log(_sq);
+    log(_sq);
     Object.keys(_sq)
       .map(function(x)
       {
@@ -264,15 +289,24 @@ log(_sq);
           .map(function(y)
           {
             log(y);
+            log('!!!!!!!!!!!');
+
             _sq[x][y].compute(function(z)
             {
-            //  log(z);
+              log('######');
+              log(z);
               var obj = {};
               obj.type = 'historical';
               obj.pair = x;
               obj.period = y;
               obj.data = z;
-              ws.send(JSON.stringify(obj));
+
+              try
+              {
+                ws.send(JSON.stringify(obj));
+              }
+              catch (e)
+              {}
             });
 
 
@@ -282,20 +316,36 @@ log(_sq);
         Object.keys(__sq[x])
           .map(function(y)
           {
+            var __tl = __sq[x][y]
+              .map(function(z)
+              {
+                return z;
+              });
 
-            __sq[x][y]
+            __tl
               .compute(function(z)
-              {log(x);
-              log(y);
-              log(z);
-              //  log(z);
+              {
+                log(x);
+                log(y);
+                log(z);
+                //  log(z);
                 var obj = {};
                 obj.type = 'onbar';
                 obj.pair = x;
                 obj.period = y;
                 obj.data = z;
-                ws.send(JSON.stringify(obj));
+                try
+                {
+                  ws.send(JSON.stringify(obj));
+                }
+                catch (e)
+                {
+                  log('error/disconnected');
 
+                  delete __tl.compute;
+
+
+                }
 
               });
           });
